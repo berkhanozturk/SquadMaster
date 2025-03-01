@@ -12,7 +12,7 @@ import org.example.Model.Player;
 
 public class ApiService {
     private static final String API_URL = "https://api-football-v1.p.rapidapi.com/v3/players/profiles";
-    private static final String API_KEY = "0338def286msh23678340aad1fd0p1d252fjsnbdca1280ab59";
+    private static final String API_KEY = "<<YOUR API KEY VALUE>>";
     private static final String API_HOST = "api-football-v1.p.rapidapi.com";
 
     public List<Player> fetchPlayers() {

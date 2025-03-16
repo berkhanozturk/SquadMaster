@@ -3,20 +3,20 @@ package org.example.Model;
 public class Player {
     private int id;
     private String name;
-    private String position;
     private int age;
+    private String position;
+    private String nationality;
     private String photo;
 
-    // Constructor
-    public Player(int id, String name, String position, int age, String photo) {
+    public Player(int id, String name, String position, int age, String nationality, String photo) {
         this.id = id;
         this.name = name;
-        this.position = position;
         this.age = age;
+        this.position = position;
+        this.nationality = nationality;
         this.photo = photo;
     }
 
-    // Getter & Setter
     public int getId() {
         return id;
     }
@@ -33,6 +33,14 @@ public class Player {
         this.name = name;
     }
 
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
     public String getPosition() {
         return position;
     }
@@ -41,12 +49,12 @@ public class Player {
         this.position = position;
     }
 
-    public int getAge() {
-        return age;
+    public String getNationality() {
+        return nationality;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setNationality(String nationality) {
+        this.nationality = nationality;
     }
 
     public String getPhoto() {
@@ -59,12 +67,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", position='" + position + '\'' +
-                ", age=" + age +
-                ", photo='" + photo + '\'' +
-                '}';
+        return name + " - " + position + " (" + nationality + "), Yaş: " + age + ", Fotoğraf: " + photo;
     }
 }

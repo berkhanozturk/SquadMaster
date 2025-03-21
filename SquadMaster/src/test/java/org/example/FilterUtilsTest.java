@@ -23,15 +23,26 @@ public class FilterUtilsTest {
     }
 
     @Test
-    void testFilterByAge() {
-        List<Player> filtered = FilterUtils.filterByAge(players, 30);
-        assertEquals(3, filtered.size(), "Players above age 30 should be 3");
+    @Test
+    public void testFilterByPosition() {
+        List<Player> players = new ArrayList<>();
+        players.add(new Player(1, "John", "Forward", 25, "England", ""));
+        players.add(new Player(2, "Mike", "Midfielder", 28, "France", ""));
+        
+        List<Player> result = FilterUtils.filterByPosition(players, "Forward");
+        assertEquals(1, result.size());
+        assertEquals("John", result.get(0).getName());
     }
 
     @Test
-    void testFilterByPosition() {
-        List<Player> filtered = FilterUtils.filterByPosition(players, "Forward");
-        assertEquals(3, filtered.size(), "Should return 3 forwards");
+    public void testFilterByAge() {
+        List<Player> players = new ArrayList<>();
+        players.add(new Player(1, "Ali", "Defender", 21, "Turkey", ""));
+        players.add(new Player(2, "Veli", "Goalkeeper", 31, "Turkey", ""));
+        
+        List<Player> result = FilterUtils.filterByAge(players, 20, 30);
+        assertEquals(1, result.size());
+        assertEquals("Ali", result.get(0).getName());
     }
 
     @Test

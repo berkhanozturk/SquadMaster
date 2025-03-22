@@ -73,42 +73,5 @@ public class SquadUI extends JFrame {
         return benchPanel;
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            // 1️⃣ "Yükleniyor..." ekranını oluştur
-            JDialog loadingDialog = new JDialog((Frame) null, "Yükleniyor...", true);
-            loadingDialog.setSize(300, 150);
-            loadingDialog.setLayout(new BorderLayout());
-            loadingDialog.add(new JLabel("Oyuncular yükleniyor, lütfen bekleyin...", SwingConstants.CENTER), BorderLayout.CENTER);
-            loadingDialog.setLocationRelativeTo(null);
-            loadingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
-            // 2️⃣ Oyuncuları arka planda yükle
-            SwingWorker<List<Player>, Void> worker = new SwingWorker<>() {
-                @Override
-                protected List<Player> doInBackground() {
-                    ApiService.initializePlayers(); // API'den oyuncuları bir kere çekiyoruz
-                    return ApiService.getCachedPlayers(); // Daha sonra buradan okuyoruz
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        List<Player> players = get();
-                        loadingDialog.dispose(); // 3️⃣ Yükleniyor ekranı kapatılır
-                        SquadUI frame = new SquadUI(players); // Ana ekran açılır
-                        frame.setVisible(true);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Oyuncular yüklenirken hata oluştu!", "Hata", JOptionPane.ERROR_MESSAGE);
-                        loadingDialog.dispose();
-                    }
-                }
-            };
-
-            // 4️⃣ SwingWorker çalışmaya başlar ve ekran görünür
-            worker.execute();
-            loadingDialog.setVisible(true);
-        });
-    }
+    
 }

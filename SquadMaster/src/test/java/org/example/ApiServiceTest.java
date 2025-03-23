@@ -19,7 +19,7 @@ private final ApiService apiService = new ApiService();//Updated line
 
         assertNotNull(teamIds, "Takım listesi null dönmemeli.");
         assertFalse(teamIds.isEmpty(), "Takım listesi boş olmamalı.");
-        System.out.println("Premier Lig Takım ID'leri: " + teamIds);
+         assertTrue(teamIds.stream().allMatch(id -> id > 0), "Her ID pozitif olmalı.");
     }
 
     @Test
@@ -43,5 +43,25 @@ private final ApiService apiService = new ApiService();//Updated line
         List<Player> players = apiService.fetchPlayers();
         assertNotNull(players);
         assertTrue(players.size() > 0, "API response should not be empty");
+    }
+    @Test
+    void testGetPlayersByTeamId() {
+        List<Integer> teamIds = ApiService.getPremierLeagueTeams();
+        assertFalse(teamIds.isEmpty(), "Premier Lig takımları boş gelmemeli.");
+
+        int teamId = teamIds.get(0);
+        List<Player> players = ApiService.getPlayers(teamId);
+
+        assertNotNull(players, "Oyuncu listesi null dönmemeli.");
+        assertFalse(players.isEmpty(), "Oyuncu listesi boş dönmemeli.");
+    }
+
+    @Test
+    void testInitializePlayersAndCache() {
+        ApiService.initializePlayers();
+        List<Player> cached = ApiService.getCachedPlayers();
+
+        assertNotNull(cached, "Cache null olmamalı.");
+        assertFalse(cached.isEmpty(), "Cache boş olmamalı.");
     }
 }

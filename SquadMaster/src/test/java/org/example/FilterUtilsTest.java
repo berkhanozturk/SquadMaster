@@ -50,4 +50,19 @@ public class FilterUtilsTest {
         List<Player> filtered = FilterUtils.filterByName(players, "Mbappe");
         assertEquals(1, filtered.size(), "Should return one player with name Mbappe");
     }
+    @Test
+    void testFilterByExactPosition() {
+        List<Player> result = FilterUtils.filterByExactPosition(players, "Kaleci");
+        assertEquals(1, result.size());
+        assertEquals("Ederson", result.get(0).getName());
+    }
+
+    @Test
+    
+
+    @Test
+    void testFilterByName_NoMatch() {
+        List<Player> result = FilterUtils.filterByName(players, "Messi");
+        assertTrue(result.isEmpty());
+    }
 }

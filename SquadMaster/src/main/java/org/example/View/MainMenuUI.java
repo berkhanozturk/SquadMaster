@@ -1,37 +1,68 @@
 package org.example.View;
 
+import org.example.Model.Player;
+import org.example.Service.ApiService;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 
 public class MainMenuUI extends JFrame {
 
     public MainMenuUI() {
-        setTitle("Squad Master - Ana Menü");
-        setSize(500, 300);
+        setTitle("Kadro Kurma Oyunu - Squad Master");
+        setSize(800, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(0, 100, 0));
 
-        JLabel titleLabel = new JLabel("⚽ Squad Master", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        titleLabel.setForeground(Color.WHITE);
-        add(titleLabel, BorderLayout.NORTH);
+        // Arka plan resmi paneli
+        BackgroundPanel backgroundPanel = new BackgroundPanel();
+        backgroundPanel.setLayout(new BorderLayout());
+        setContentPane(backgroundPanel);
 
+        // 🔲 Beyaz kutu paneli (başlık için)
+        JPanel titleBox = new JPanel();
+        titleBox.setBackground(Color.WHITE);
+        titleBox.setOpaque(true);
+        titleBox.setLayout(new BorderLayout());
+        titleBox.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY, 2),             // Dış gri çerçeve
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)            // İç padding
+        ));
+        titleBox.setPreferredSize(new Dimension(340, 60));
+
+        // 🏷️ Başlık etiketi
+        JLabel titleLabel = new JLabel("🏟️ SquadMaster", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        titleLabel.setForeground(Color.BLACK);
+        titleBox.add(titleLabel, BorderLayout.CENTER);
+
+        JPanel titleWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        titleWrapper.setOpaque(false); // Arka planı şeffaf
+        titleWrapper.add(titleBox);
+        backgroundPanel.add(titleWrapper, BorderLayout.NORTH);
+        
+        // Başlat butonu
         JButton startButton = new JButton("🎮 Oyuna Başla");
         startButton.setFont(new Font("Arial", Font.BOLD, 20));
+        startButton.setBackground(new Color(0, 150, 0));
+        startButton.setForeground(Color.BLACK);
+        startButton.setFocusPainted(false);
+        startButton.setPreferredSize(new Dimension(200, 50));
         startButton.addActionListener(this::startGame);
 
-        JPanel centerPanel = new JPanel();
-        centerPanel.setBackground(new Color(0, 100, 0));
-        centerPanel.add(startButton);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false); // Panelin arka planını şeffaf yap
+        buttonPanel.add(startButton);
 
-        add(centerPanel, BorderLayout.CENTER);
+        backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void startGame(ActionEvent e) {
-        // Oyuncular arka planda yüklensin
         JDialog loadingDialog = new JDialog(this, "Yükleniyor...", true);
         loadingDialog.setSize(300, 150);
         loadingDialog.setLayout(new BorderLayout());
@@ -39,19 +70,26 @@ public class MainMenuUI extends JFrame {
         loadingDialog.setLocationRelativeTo(this);
         loadingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+        SwingWorker<List<Player>, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() {
-                org.example.Service.ApiService.initializePlayers();
-                return null;
+            protected List<Player> doInBackground() {
+                ApiService.initializePlayers();
+                return ApiService.getCachedPlayers();
             }
 
             @Override
             protected void done() {
-                loadingDialog.dispose();
-                SquadUI squadUI = new SquadUI(org.example.Service.ApiService.getCachedPlayers());
-                squadUI.setVisible(true);
-                dispose(); // Ana menüyü kapat
+                try {
+                    List<Player> players = get();
+                    loadingDialog.dispose();
+                    SquadUI squadUI = new SquadUI(players);
+                    squadUI.setVisible(true);
+                    dispose();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Oyuncular yüklenirken hata oluştu!", "Hata", JOptionPane.ERROR_MESSAGE);
+                    loadingDialog.dispose();
+                }
             }
         };
 
@@ -61,8 +99,31 @@ public class MainMenuUI extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            MainMenuUI mainMenu = new MainMenuUI();
-            mainMenu.setVisible(true);
+            MainMenuUI menu = new MainMenuUI();
+            menu.setVisible(true);
         });
     }
+
+    // Arka plan resmi paneli
+    class BackgroundPanel extends JPanel {
+        private Image backgroundImage;
+    
+        public BackgroundPanel() {
+            try {
+                // 📦 Proje içinden, classpath üzerinden yüklenir
+                backgroundImage = new ImageIcon(getClass().getClassLoader().getResource("menu5.png")).getImage();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (backgroundImage != null) {
+                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this); // Ekran boyutuna yay
+            }
+        }
+    }
+    
 }

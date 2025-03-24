@@ -1,12 +1,11 @@
-package org.example.Extensions;
-
+package org.example;
+import org.example.Extensions.PlayerButton;
 import org.example.Model.Player;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import javax.swing.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerButtonTest {
 

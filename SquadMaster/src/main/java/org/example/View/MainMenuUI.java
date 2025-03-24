@@ -46,21 +46,94 @@ public class MainMenuUI extends JFrame {
         titleWrapper.add(titleBox);
         backgroundPanel.add(titleWrapper, BorderLayout.NORTH);
         
-        // Başlat butonu
-        JButton startButton = new JButton("🎮 Oyuna Başla");
-        startButton.setFont(new Font("Arial", Font.BOLD, 20));
-        startButton.setBackground(new Color(0, 150, 0));
-        startButton.setForeground(Color.BLACK);
-        startButton.setFocusPainted(false);
-        startButton.setPreferredSize(new Dimension(200, 50));
-        startButton.addActionListener(this::startGame);
+        // Butonlar paneli (alt kısım)
+JPanel buttonPanel = new JPanel();
+buttonPanel.setOpaque(false);
+buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false); // Panelin arka planını şeffaf yap
-        buttonPanel.add(startButton);
+// ➕ Yeni Kadro Butonu
+JButton newSquadButton = new JButton("➕ Yeni Kadro Oluştur");
+newSquadButton.setFont(new Font("Arial", Font.BOLD, 18));
+newSquadButton.setBackground(new Color(0, 150, 0));
+newSquadButton.setForeground(Color.BLACK);
+newSquadButton.setFocusPainted(false);
+newSquadButton.setPreferredSize(new Dimension(250, 50));
+newSquadButton.addActionListener(this::startNewSquad);
 
-        backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);
+// 📂 Kadro Yükle Butonu
+JButton loadSquadButton = new JButton("📂 Kadroyu Yükle");
+loadSquadButton.setFont(new Font("Arial", Font.BOLD, 18));
+loadSquadButton.setBackground(new Color(0, 120, 200));
+loadSquadButton.setForeground(Color.BLACK);
+loadSquadButton.setFocusPainted(false);
+loadSquadButton.setPreferredSize(new Dimension(250, 50));
+loadSquadButton.addActionListener(this::loadSquadFromFile);
+
+// Butonları ekle
+buttonPanel.add(newSquadButton);
+buttonPanel.add(loadSquadButton);
+backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);
+
     }
+
+    private void startNewSquad(ActionEvent e) {
+        JDialog loadingDialog = new JDialog(this, "Yükleniyor...", true);
+        loadingDialog.setSize(300, 150);
+        loadingDialog.setLayout(new BorderLayout());
+        loadingDialog.add(new JLabel("Oyuncular yükleniyor, lütfen bekleyin...", SwingConstants.CENTER), BorderLayout.CENTER);
+        loadingDialog.setLocationRelativeTo(this);
+        loadingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+    
+        SwingWorker<List<Player>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<Player> doInBackground() {
+                ApiService.initializePlayers();
+                return ApiService.getCachedPlayers();
+            }
+    
+            @Override
+            protected void done() {
+                try {
+                    List<Player> players = get();
+                    loadingDialog.dispose();
+                    SquadUI squadUI = new SquadUI(players);
+                    squadUI.setVisible(true);
+                    dispose();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Oyuncular yüklenirken hata oluştu!", "Hata", JOptionPane.ERROR_MESSAGE);
+                    loadingDialog.dispose();
+                }
+            }
+        };
+    
+        worker.execute();
+        loadingDialog.setVisible(true);
+    }
+    
+    private void loadSquadFromFile(ActionEvent e) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Bir kadro dosyası seçin");
+        int result = chooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            try {
+                java.nio.file.Path path = chooser.getSelectedFile().toPath();
+                String json = java.nio.file.Files.readString(path);
+                com.google.gson.Gson gson = new com.google.gson.Gson();
+                java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<java.util.List<Player>>() {}.getType();
+                List<Player> loadedPlayers = gson.fromJson(json, type);
+    
+                SquadUI squadUI = new SquadUI(loadedPlayers);
+                squadUI.setVisible(true);
+                dispose();
+    
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Kadro yüklenemedi!", "Hata", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
 
     private void startGame(ActionEvent e) {
         JDialog loadingDialog = new JDialog(this, "Yükleniyor...", true);

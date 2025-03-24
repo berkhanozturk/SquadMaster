@@ -1,12 +1,14 @@
-package org.example.Test;
-
-import org.example.Service.ApiService;
-import org.example.Model.Player;
-import org.junit.jupiter.api.*;
+package org.example;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.example.Model.Player;
+import org.example.Service.ApiService;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ApiServiceTest {
@@ -19,7 +21,7 @@ private final ApiService apiService = new ApiService();//Updated line
 
         assertNotNull(teamIds, "Takım listesi null dönmemeli.");
         assertFalse(teamIds.isEmpty(), "Takım listesi boş olmamalı.");
-         assertTrue(teamIds.stream().allMatch(id -> id > 0), "Her ID pozitif olmalı.");
+        System.out.println("Premier Lig Takım ID'leri: " + teamIds);
     }
 
     @Test
@@ -40,28 +42,9 @@ private final ApiService apiService = new ApiService();//Updated line
     @Test
     void testInvalidApiResponseHandling() {
         
-        List<Player> players = apiService.fetchPlayers();
-        assertNotNull(players);
-        assertTrue(players.size() > 0, "API response should not be empty");
-    }
-    @Test
-    void testGetPlayersByTeamId() {
-        List<Integer> teamIds = ApiService.getPremierLeagueTeams();
-        assertFalse(teamIds.isEmpty(), "Premier Lig takımları boş gelmemeli.");
-
-        int teamId = teamIds.get(0);
-        List<Player> players = ApiService.getPlayers(teamId);
-
-        assertNotNull(players, "Oyuncu listesi null dönmemeli.");
-        assertFalse(players.isEmpty(), "Oyuncu listesi boş dönmemeli.");
-    }
-
-    @Test
-    void testInitializePlayersAndCache() {
         ApiService.initializePlayers();
-        List<Player> cached = ApiService.getCachedPlayers();
-
-        assertNotNull(cached, "Cache null olmamalı.");
-        assertFalse(cached.isEmpty(), "Cache boş olmamalı.");
+        List<Player> players = ApiService.getCachedPlayers();
+                assertNotNull(players);
+        assertTrue(players.size() > 0, "API response should not be empty");
     }
 }

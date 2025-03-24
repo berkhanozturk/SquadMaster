@@ -19,6 +19,14 @@ public class PlayerButton extends JButton {
         addActionListener(e -> openPlayerSelection());
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
     private void setupButtonUI() {
         // Önce butondaki her şeyi temizle, aksi halde üst üste ekleme yapar!
         removeAll();

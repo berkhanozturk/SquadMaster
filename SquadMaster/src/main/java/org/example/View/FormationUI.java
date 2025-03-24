@@ -89,4 +89,64 @@ public class FormationUI {
 
         return fieldPanel;
     }
+
+    // overload -- kaydedilmiş kadroyu getirme
+    public static JPanel createFormationPanel(String formation, List<PlayerButton> playerButtonList) {
+        JPanel fieldPanel = new JPanel() {
+            @Override
+            
+protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    try {
+        Image backgroundImage = new ImageIcon(getClass().getClassLoader().getResource("footballField.png")).getImage();
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+        };
+    
+        fieldPanel.setLayout(new GridLayout(4, 1, 10, 10));
+        fieldPanel.setPreferredSize(new Dimension(900, 700));
+        fieldPanel.setOpaque(false);
+    
+        if (!FORMATIONS.containsKey(formation)) return fieldPanel;
+    
+        int[][] positions = FORMATIONS.get(formation);
+    
+        for (int i = 0; i < positions.length; i++) {
+            JPanel rowPanel = new JPanel();
+            rowPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 80, 10));
+            rowPanel.setOpaque(false);
+    
+            for (int j = 0; j < positions[i].length; j++) {
+                PlayerButton playerButton = new PlayerButton(new Player(0, "seç", "", 0, "", ""));
+                playerButtonList.add(playerButton); // 🔥 Buton listeye ekleniyor
+                rowPanel.add(playerButton);
+            }
+    
+            fieldPanel.add(rowPanel);
+        }
+    
+        return fieldPanel;
+    }
+    
+
+public static List<PlayerButton> getAllPlayerButtonsFromPanel(JPanel panel) {
+    List<PlayerButton> buttons = new ArrayList<>();
+    for (Component row : panel.getComponents()) {
+        if (row instanceof JPanel rowPanel) {
+            for (Component c : rowPanel.getComponents()) {
+                if (c instanceof PlayerButton btn) {
+                    buttons.add(btn);
+                }
+            }
+        }
+    }
+    return buttons;
+}
+
+
+    
 }

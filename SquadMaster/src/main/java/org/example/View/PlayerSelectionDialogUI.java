@@ -16,17 +16,18 @@ public class PlayerSelectionDialogUI extends JDialog {
     private DefaultListModel<String> listModel;
     private JComboBox<String> positionFilter;
     private JTextField nameFilterField;
+    private JComboBox<String> minAgeCombo;
+    private JComboBox<String> maxAgeCombo;
+
     private List<Player> allPlayers;
     private Player selectedPlayer;
 
-
     public PlayerSelectionDialogUI(Frame parent, ApiService apiService) {
         super(parent, "Oyuncu Seçimi", true);
-        setSize(400, 550);
+        setSize(750, 600);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Başlangıç oyuncu verisi
         allPlayers = ApiService.getCachedPlayers();
 
         // Oyuncu listesi
@@ -35,10 +36,10 @@ public class PlayerSelectionDialogUI extends JDialog {
         JScrollPane scrollPane = new JScrollPane(playerList);
 
         // Mevki filtreleme
-        positionFilter = new JComboBox<>(new String[]{"Tümü", "Forvet", "Orta Saha", "Defans", "Kaleci"});
+        positionFilter = new JComboBox<>(new String[]{"Tümü", "Attacker", "Midfielder", "Defender", "Goalkeeper"});
         positionFilter.addActionListener(e -> filterPlayers());
 
-        // İsim filtreleme
+        // İsim filtreleme (JTextField)
         nameFilterField = new JTextField(15);
         nameFilterField.addKeyListener(new KeyAdapter() {
             @Override
@@ -47,7 +48,19 @@ public class PlayerSelectionDialogUI extends JDialog {
             }
         });
 
-        // Seçim butonu
+        // Yaş filtreleme
+        minAgeCombo = new JComboBox<>();
+        maxAgeCombo = new JComboBox<>();
+        minAgeCombo.addItem("Min");
+        maxAgeCombo.addItem("Max");
+        for (int i = 16; i <= 45; i++) {
+            minAgeCombo.addItem(String.valueOf(i));
+            maxAgeCombo.addItem(String.valueOf(i));
+        }
+        minAgeCombo.addActionListener(e -> filterPlayers());
+        maxAgeCombo.addActionListener(e -> filterPlayers());
+
+        // Oyuncu Seç Butonu
         JButton selectButton = new JButton("Oyuncuyu Seç");
         selectButton.addActionListener(e -> {
             int selectedIndex = playerList.getSelectedIndex();
@@ -56,65 +69,77 @@ public class PlayerSelectionDialogUI extends JDialog {
                 String selectedName = selectedValue.split(" - ")[0];
 
                 selectedPlayer = allPlayers.stream()
-                        .filter(p -> p.getName().equals(selectedName))
+                        .filter(p -> p.getName().equalsIgnoreCase(selectedName))
                         .findFirst()
                         .orElse(null);
                 dispose();
             }
         });
 
-        // 🚀 **Silme butonu ekleme**
+        // Oyuncu Sil Butonu
         JButton removeButton = new JButton("Oyuncuyu Sil");
         removeButton.addActionListener(e -> {
             selectedPlayer = new Player(0, "Seç", "", 0, "", "");
             dispose();
         });
 
-        // Üst panel (filtreler)
-        JPanel topPanel = new JPanel();
-        topPanel.add(new JLabel("Mevki:"));
-        topPanel.add(positionFilter);
-        topPanel.add(new JLabel("İsim:"));
-        topPanel.add(nameFilterField);
+        // Üst Panel - Filtreler
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.add(new JLabel("Mevki:"));
+        filterPanel.add(positionFilter);
+        filterPanel.add(new JLabel("Yaş Min:"));
+        filterPanel.add(minAgeCombo);
+        filterPanel.add(new JLabel("Yaş Max:"));
+        filterPanel.add(maxAgeCombo);
+        filterPanel.add(new JLabel("İsim:"));
+        filterPanel.add(nameFilterField);
 
+        // Alt Panel - Seç / Sil
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(selectButton);
         bottomPanel.add(removeButton);
 
-        // Ekrana ekle
-        add(topPanel, BorderLayout.NORTH);
+        // Arayüzü birleştir
+        add(filterPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Başlangıçta listele
         updatePlayerList(allPlayers);
-    }
-
-    private void updatePlayerList(List<Player> players) {
-        listModel.clear();
-
-        for (Player player : players) {
-            listModel.addElement(player.getName() + " - " + player.getPosition());
-        }
     }
 
     private void filterPlayers() {
         String selectedPosition = (String) positionFilter.getSelectedItem();
-        String nameFilter = nameFilterField.getText();
+        String nameFilter = nameFilterField.getText().trim().toLowerCase();
+        String minAgeStr = (String) minAgeCombo.getSelectedItem();
+        String maxAgeStr = (String) maxAgeCombo.getSelectedItem();
+
+        int minAge = minAgeStr.equals("Min") ? -1 : Integer.parseInt(minAgeStr);
+        int maxAge = maxAgeStr.equals("Max") ? -1 : Integer.parseInt(maxAgeStr);
 
         List<Player> filtered = allPlayers;
 
-        // Pozisyon filtresi "Tümü" değilse uygula
         if (!selectedPosition.equalsIgnoreCase("Tümü")) {
             filtered = FilterUtils.filterByExactPosition(filtered, selectedPosition);
         }
 
-        // İsim filtresi varsa uygula
         if (!nameFilter.isBlank()) {
             filtered = FilterUtils.filterByName(filtered, nameFilter);
         }
 
+        filtered = FilterUtils.filterByAge(filtered, minAge, maxAge);
+
         updatePlayerList(filtered);
+    }
+
+    private void updatePlayerList(List<Player> players) {
+        listModel.clear();
+        if (players.isEmpty()) {
+            listModel.addElement("Oyuncu bulunamadı!");
+        } else {
+            for (Player p : players) {
+                listModel.addElement(p.getName() + " - " + p.getPosition());
+            }
+        }
     }
 
     public Player getSelectedPlayer() {

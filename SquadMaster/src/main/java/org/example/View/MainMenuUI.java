@@ -7,8 +7,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainMenuUI extends JFrame {
@@ -24,7 +27,7 @@ public class MainMenuUI extends JFrame {
         backgroundPanel.setLayout(new BorderLayout());
         setContentPane(backgroundPanel);
 
-        // 🔲 Beyaz kutu paneli (başlık için)
+        //  Beyaz kutu paneli (başlık için)
         JPanel titleBox = new JPanel();
         titleBox.setBackground(Color.WHITE);
         titleBox.setOpaque(true);
@@ -42,10 +45,10 @@ public class MainMenuUI extends JFrame {
         titleBox.add(titleLabel, BorderLayout.CENTER);
 
         JPanel titleWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titleWrapper.setOpaque(false); // Arka planı şeffaf
+        titleWrapper.setOpaque(false);
         titleWrapper.add(titleBox);
         backgroundPanel.add(titleWrapper, BorderLayout.NORTH);
-        
+
         // Başlat butonu
         JButton startButton = new JButton("🎮 Oyuna Başla");
         startButton.setFont(new Font("Arial", Font.BOLD, 20));
@@ -55,8 +58,9 @@ public class MainMenuUI extends JFrame {
         startButton.setPreferredSize(new Dimension(200, 50));
         startButton.addActionListener(this::startGame);
 
+
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false); // Panelin arka planını şeffaf yap
+        buttonPanel.setOpaque(false);
         buttonPanel.add(startButton);
 
         backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -107,16 +111,16 @@ public class MainMenuUI extends JFrame {
     // Arka plan resmi paneli
     class BackgroundPanel extends JPanel {
         private Image backgroundImage;
-    
+
         public BackgroundPanel() {
             try {
-                // 📦 Proje içinden, classpath üzerinden yüklenir
+                // Proje içinden, classpath üzerinden yüklenir
                 backgroundImage = new ImageIcon(getClass().getClassLoader().getResource("menu5.png")).getImage();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -125,5 +129,5 @@ public class MainMenuUI extends JFrame {
             }
         }
     }
-    
+
 }

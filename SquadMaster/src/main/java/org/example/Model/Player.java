@@ -16,7 +16,8 @@ public class Player {
         this.nationality = nationality;
         this.photo = photo;
     }
-
+    public Player() {
+    }
     public int getId() {
         return id;
     }
@@ -68,5 +69,24 @@ public class Player {
     @Override
     public String toString() {
         return name + " - " + position + " (" + nationality + "), Yaş: " + age + ", Fotoğraf: " + photo;
+    }
+
+
+    // Kadroyu dosyaya yazmak için string'e dönüştür
+    public String toDataString() {
+        return id + ";" + name + ";" + position + ";" + age + ";" + nationality + ";" + photo;
+    }
+
+    // Dosyadan okuma sırasında string'i Player nesnesine çevir
+    public static Player fromDataString(String data) {
+        String[] parts = data.split(";");
+        return new Player(
+                Integer.parseInt(parts[0]),
+                parts[1],
+                parts[2],
+                Integer.parseInt(parts[3]),
+                parts[4],
+                parts[5]
+        );
     }
 }

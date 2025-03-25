@@ -17,7 +17,8 @@ public class FilterUtils {
 
     public static List<Player> filterByAge(List<Player> players, int minAge, int maxAge) {
         return players.stream()
-                .filter(p -> p.getAge() >= minAge && p.getAge() <= maxAge)
+                .filter(p -> (minAge == -1 || p.getAge() >= minAge) &&
+                        (maxAge == -1 || p.getAge() <= maxAge))
                 .collect(Collectors.toList());
     }
 
